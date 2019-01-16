@@ -1,4 +1,4 @@
-#include <SimpleTimer.h>
+#include "SimpleTimer.h"
 
 #include "calc.h"
 #include "display.h"
@@ -7,6 +7,9 @@
 
 // current state
 int count = 0;
+int thirds = 0;
+int fifths = 0;
+int seventh = 0;
 
 // timer
 SimpleTimer timer;
@@ -25,23 +28,49 @@ void cycleOff() {
   digitalWrite(HALF, LOW);
   digitalWrite(QUARTER, LOW);
   digitalWrite(EIGHTH, LOW);
+  digitalWrite(SIXTEENTH, LOW);
+
+  digitalWrite(SIX_THIRDS, LOW);
+  digitalWrite(SIX_FIFTHS, LOW);
+  digitalWrite(SIX_SEVENTH, LOW);
 
   count++;
+  thirds++;
+  fifths++;
+  seventh++;
 
-  if (count == 8) {
+  if (count == 16) {
     count = 0;
+  }
+
+  if (thirds == 6) {
+    thirds = 0;
+  }
+  if (fifths == 10) {
+    fifths = 0;
+  }
+  if (seventh == 14) {
+    seventh = 0;
   }
 }
 
 /*
-1. * * * *
-2. *
-3. * *
-4. *
-5. * * *
-6. *
-7. * *
-8. *
+ 1. * * * * *
+ 2. *
+ 3. * *
+ 4. *
+ 5. * * *
+ 6. *
+ 7. * *
+ 8. *
+ 9. * * * *
+10. *
+11. * *
+12. *
+13. * * *
+14. *
+15. * *
+16. *
  */
 
 void cycleOn() {
@@ -51,47 +80,107 @@ void cycleOn() {
       digitalWrite(HALF, HIGH);
       digitalWrite(QUARTER, HIGH);
       digitalWrite(EIGHTH, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
 
     case 1:
-      digitalWrite(WHOLE, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
 
     case 2:
       digitalWrite(WHOLE, HIGH);
-      digitalWrite(HALF, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
 
     case 3:
-      digitalWrite(WHOLE, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
 
     case 4:
       digitalWrite(WHOLE, HIGH);
       digitalWrite(HALF, HIGH);
-      digitalWrite(QUARTER, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
 
     case 5:
-      digitalWrite(WHOLE, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
 
     case 6:
       digitalWrite(WHOLE, HIGH);
-      digitalWrite(HALF, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
 
     case 7:
-      digitalWrite(WHOLE, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
       break;
+
+    case 8:
+      digitalWrite(WHOLE, HIGH);
+      digitalWrite(HALF, HIGH);
+      digitalWrite(QUARTER, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+
+    case 9:
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+
+    case 10:
+      digitalWrite(WHOLE, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+
+    case 11:
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+
+    case 12:
+      digitalWrite(WHOLE, HIGH);
+      digitalWrite(HALF, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+
+    case 13:
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+
+    case 14:
+      digitalWrite(WHOLE, HIGH);
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+
+    case 15:
+      digitalWrite(SIXTEENTH, HIGH);
+      break;
+  }
+
+  if (thirds == 0) {
+    digitalWrite(SIX_THIRDS, HIGH);
+  }
+  
+  if (fifths == 0) {
+    digitalWrite(SIX_FIFTHS, HIGH);
+  }
+
+  if (seventh == 0) {
+    digitalWrite(SIX_SEVENTH, HIGH);
   }
 
   // figure out bpm and duration values
   int bpm_pot = analogMultiRead(BPM);
+  Serial.print("analog value: ");
+  Serial.println(bpm_pot);
   int duration_pot = analogMultiRead(DURATION);
   int bpm = round(calculatedBPM(bpm_pot));
   float percentage = calculatedPercentage(duration_pot);
-  unsigned long duration = tickDuration(bpm * 2);
+  
+  // at high bpms, we need to have the best chance possible to get a clean signal across
+  //   so the other side detects it correctly
+  if (bpm > 130) {
+    percentage = 0.5;
+  }
+  unsigned long duration = tickDuration(bpm * 4);
 
   // figure out the next cycle off and set it based on bpm
   unsigned long next_start = duration;
@@ -110,6 +199,8 @@ void cycleOn() {
 #if DEBUG
   Serial.print("Calculated BPM: ");
   Serial.println(bpm);
+  Serial.print("Percentage: ");
+  Serial.println(percentage);
   Serial.print("Start: ");
   Serial.println(next_start);
   Serial.print("Stop:  ");
@@ -131,6 +222,11 @@ void setup() {
   pinMode(HALF, OUTPUT);
   pinMode(QUARTER, OUTPUT);
   pinMode(EIGHTH, OUTPUT);
+  pinMode(SIXTEENTH, OUTPUT);
+  
+  pinMode(SIX_THIRDS, OUTPUT);
+  pinMode(SIX_FIFTHS, OUTPUT);
+  pinMode(SIX_SEVENTH, OUTPUT);
 
 #if HAS_SCREEN
   setup_display();

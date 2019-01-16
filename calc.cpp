@@ -7,6 +7,9 @@
 // calculated BPM value based on a percentage of the minimum and maximum BPM's
 // linear TODO: investigate curves
 float calculatedBPM (int value) {
+#if ANALOG_OFFSET_USED
+  value = map(value, ANALOG_OFFSET_MIN, ANALOG_OFFSET_MAX, 0, 1023);
+#endif
   float bpm = (float((float) value / 1023) * (MAX_BPM - MIN_BPM)) + MIN_BPM;
 
   return bpm;
