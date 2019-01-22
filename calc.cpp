@@ -19,7 +19,8 @@ float calculatedPercentage (int value) {
   float fvalue = (float) value;
   float percent = abs((fvalue - (BIAS * 2))) / 1023;
 
-  return percent;
+  // mult by > 100 to reach max value for sure (makes bias feature obsolete?)
+  return map(min(100, percent * 110), 0, 100, 0, MAX_PERCENTAGE) / 100.0;
 }
 
 float tickDuration (int bpm) {
@@ -45,3 +46,6 @@ char *ftoa (char *str, float f, int precision) {
 
   return ret;
 }
+
+
+

@@ -7,18 +7,24 @@
 #define ANALOG_OFFSET_MIN 460
 #define ANALOG_OFFSET_MAX 905
 
+#define MAX_PERCENTAGE 95
+
 // number of BPM when turned all of the way to the left
-#define MIN_BPM 40
+#define MIN_BPM 30
 
 // number of BPM when turned all of the way to the right
-#define MAX_BPM 300
+#define MAX_BPM 450
 
 // bias number of MS for turning off of the signal
-#define BIAS 10
+#define BIAS 2
 
 // potentiometer inputs
 #define BPM      A2
-#define DURATION A1
+#define DURATION A3
+// other inputs
+#define ROT_DIVIDER          A4
+#define SW_DURATION_PER_NOTE A5
+#define SW_ODDS_RETRIGGER    A6
 
 // outputs
 #define SIXTEENTH 4
@@ -35,3 +41,6 @@
 // screen
 #define HAS_SCREEN false
 #define SCREEN_ADDR 0x7A
+
+
+
